@@ -1,4 +1,6 @@
 1. git init
-2. git add -A
+2. git add -A   || jika lebih spesifik bisa git add app.js
 3. git status
-git commit -m "Initial commit"  // unutk commit jika terjadi modifikasi/perubahan
+4. git commit -m "Initial commit"  // unutk commit jika terjadi modifikasi/perubahan
+5. git remote add origin https://github.com/andokusumahpratama/Natours-API.git  // ini repository github
+6. git push origin master
