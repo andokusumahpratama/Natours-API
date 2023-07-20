@@ -1,0 +1,138 @@
+npm i dotenv
+
+npm i eslint prettier eslint-config-prettier eslint-plugin-prettier eslint-config-airbnb eslint-plugin-node eslint-plugin-import eslint-plugin-jsx-a11y eslint-plugin-react --save-d
+npm i mongoose
+npm i slugify
+npm i validator
+npm i ndb --global(ini untuk error handling pada node js express)
+npm i bcryptjs
+npm i jsonwebtoken
+npm i nodemailer (ini untuk email)
+npm i express-rate-limit (ini untuk mencegah brute force)
+npm i helmet (ini untuk melindungi HTTP header)
+npm i express-mongo-sanitize (untuk melindungi dari sql injection)  contoh "email": {"$gt": ""},
+npm i xss-clean (untuk menghapus contoh npm uninstall xss)
+npm i hpp (untuk parameter pollution)
+npm i pug
+npm i cookie-parser (untuk mengenali cookie browser)
+npm i parcel
+npm i axios
+npm i @babel/polyfill
+npm i multer (untuk dapat upload image)
+npm i sharp (resize image)
+npm i html-to-text
+npm i stripe (payment stripe) https://stripe.com/docs/checkout/quickstart?lang=node | https://stripe.com/docs/payments/checkout/migrating-prices
+
+
+mongoose.connect(DB, { //? INI UNTUK CONNECT KE MONGODB ALTAR
+// mongoose.connect(process.env.DATABASE_LOCAL, {    //? INI UNTUK CONNECT KE MONGODB LOCAL
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  }).then(() => {    
+//   }).then((conn) => {    // ? ini untuk menampilkan maksud dari conn
+    // console.log(conn.connections);
+    // console.log('DB connection successful!');    
+  }).catch((error) => {
+    console.error('DB connection failed:', error);
+  });
+
+127.0.0.1:8000/api/v1/tours?duration[gte]=5&difficulty=easy&sort=1&limit=10&page=2
+
+ALUR LOGIKANYA
+1. DARI SERVER.JS MENGAMBIL ELEMENT DARI APP.JS 
+2. DARI APP.JS MENGAMBIL ELEMENT DARI ROUTES
+3. DARI ROUTES MENGAMBIL ELEMENT DARI CONTROLLER
+4. DARI CONTROLLER MENGAMBIL ELEMENT DARI MODELS
+4.1 DARI CONTROLLER MENGAMBIL ELEMENT DARI UTILS APIFeatures 
+
+
+
+ATURAN LOGIKA PADA error
+1. Dari APP.JS MEMBANGUN GLOBAL HANDLING ERROR MIDDLEWARE
+2. KEMUDIAN MEMBANGUN CLASS APPERROR DENGAN EXTENDS ERROR UNTUK MENGATUR SET ERRORNYA SECARA MANUAL
+3. MENGGUNAKAN next(new AppError(`PESAN`, 404)); UNTUK MENGIRIM KE GLOBAL HANDLING ERROR MIDDLEWARE JIKA TERJADI ERROR 
+4. KEMUDIAN UNTUK DI CONTROLLER MENGGUNAKAN CATCHASYNC SEBAGAI CARA UNTUK BISA DI NEXT JIKA TERJADI ERROR
+
+
+ATURAN LOGIKA REGIS
+1. DARI ROUTES userRoute MENGAMBIL authController.signup
+2. DATA PASSWORD YANG DIKIRIM DARI POSTMAN AKAN DI ENKRIPSI SEBELUM DI SAVE (ATURAN CODINGNYA ADA DI userModel)
+3. DARI authController.signup MELAKUKAN PEMBUATAN TOKEN DI FUNCTION signToken, DAN BERLAKU TOKEN TERSEBUT SESUAI DENGAN process.env.JWT_EXPIRES_IN
+4. KEMUDIAN POSTMAN AKAN MENYIMPAN TOKEN DARI SIGN (LIHAT ATURAN SCRIPTNYA DI POSTMAN)
+
+ATURAN LOGIKA LOGIN
+1. DARI ROUTES userRoute MENGAMBIL authController.login
+2. DATA AKAN DIVERIFIKASI APAKAH EMAIL DAN PASSWORD DIISI ATAU TIDAK
+3. KEMUDIAN DIVERIFIKASI KEMBALI APAKAH EMAIL DAN PASSWORD SESUAI ATAU TIDAK (ATURAN CODINGNYA ADA DI userModel.correctPassword)
+4. JIKA BERHASIL MAKA TOKEN DIBUAT, DAN BERLAKU TOKEN TERSEBUT SESUAI DENGAN process.env.JWT_EXPIRES_IN
+
+
+ATURAN LOGIKA RESET PASSWORD USER
+1. DARI ROUTES userRoute MENGAMBIL authController.forgotPassword
+2. KEMUDIAN PENGGUNA MEMASUKAN EMAIL DARI POSTMAN UNTUK MELAKUKAN RESET PASSWORD
+3. KEMUDIAN DIBUATKAN resetToken DI user.createPasswordResetToken untuk dikirim EMAIl, NAMUN KODE TOKEN YANG DI SAVE DI DATABASE DILAKUKAN CRYPTO DAN DIBUATKAN TANGGAL EXPIRES/KADALUARSA TOKEN CRYPTO 
+
+
+ATURAN LOGIKA HANYA ADMIN YANG BISA DELETE TOUR
+1. DARI ROUTES tourRoute MENGAMBIL DARI authController.protect UNTUK MENGECEK APAKAH DIA SUDAH LOGIN ATAU BELUM KALAU SUDAH MAKA DIA MEMILIKI TOKEN
+2. ATURAN PADA authController.protect AKAN MENGECEK APAKAH SETELAH Bearer MEMILIKI TOKEN ATAU TIDAK JIKA TIDAK MAKA AKAN DILEMPAR ERROR
+3. JIKA ADA TOKEN MAKA AKAN DI DECODED UNTUK DIPERIKSA APAKAH TOKEN SESUAI ATAU TIDAK DENGAN PEMILIK USER SERTA DICOCOKAN DENGAN process.env.JWT_SECRET
+4. JIKA SUDAH SESUAI MAKA DILAKUKAN VERFIKASI KEMBALI APAKAH HASIL DARI GENERATE TOKEN (ID) MASIH ADA ATAU TIDAK AKUN USERNYA
+5. JIKA MASIH DILAKUKAN VERIFIKASI KEMBALI APAKAH USER SEBELUMNYA SUDAH BERGANTI PASSWORD ATAU BELUM (CASE INI ADA KARENA JIKA TOKEN SEBELUMNYA BELUM HABIS NAMUN DIA MENGGANTI PASSWORD MAKA TOKEN YANG SEBELUMNYA HARUS BARU/DIRESET)
+6. CARA CEK DARI LANJUTAN NOMOR 5 ADALAH DI userModel.changePasswordAfter DILIHAT DARI TANGGAL DIDAPAT TOKEN DENGAN(IAT) DENGAN TANGGAL DIA MERUBAH PASSWORD
+7. INFORMASI AKUN DISIMPAN DI req.user
+
+8. JIKA SUDAH LANJUT KE authController.restricTo('admin', 'lead-guide')
+9. DI authController.restricTo AKAN MENGECEK APAKAN req.user.role ('admin', 'lead-guide')
+10. JIKA IYA MAKA BISA LANJUT DELETE DI tourController.deleteTour
+
+
+
+
+
+
+ADANYA PACKAGE HELMET 
+1. Mencegah serangan Cross-Site Scripting (XSS): Helmet mengatur header X-XSS-Protection untuk meminta browser untuk memblokir skrip yang mencurigakan atau berbahaya yang dapat dieksekusi oleh serangan XSS. Ini membantu melindungi pengguna dari serangan yang mencoba menyisipkan skrip berbahaya ke dalam halaman web.
+
+2. Melindungi dari serangan Clickjacking: Helmet mengatur header X-Frame-Options untuk membatasi cara bagaimana halaman dapat diperlihatkan dalam iframe. Ini mencegah serangan clickjacking di mana penyerang mencoba menyembunyikan elemen yang menipu di bawah elemen yang sah dan memanipulasi tindakan klik pengguna.
+
+3. Mengamankan komunikasi melalui HTTPS: Helmet menggunakan middleware helmet-hsts yang mengatur header Strict Transport Security (HSTS). Dengan mengatur header ini, aplikasi Anda akan memaksa pengguna untuk selalu berkomunikasi melalui HTTPS, menghindari serangan Man-in-the-Middle dan penyerangan jaringan.
+
+4. Perlindungan terhadap serangan CSRF: Helmet membantu melindungi aplikasi dari serangan Cross-Site Request Forgery (CSRF) dengan menggunakan token CSRF dan mengatur header SameSite pada cookie untuk membatasi pengiriman cookie dari luar domain.
+
+5. Penghapusan informasi sensitif: Helmet menghapus header X-Powered-By yang mengungkapkan informasi tentang teknologi yang digunakan dalam aplikasi, seperti Express atau framework lainnya. Dengan menghilangkan header ini, Anda dapat mengurangi risiko serangan yang memanfaatkan kerentanan versi yang sudah usang.
+
+
+
+
+KELEMAHAN DAN HARUS DI PERBAIKI
+1. DI TOUR GUIDES SEANDAINYA DARI SALAH SATU ID USER MEMASUKAN USER YANG BUKAN GUIDES, SEHARUSNYA TIDAK BISA SEHINGGA HARUS DILAKUKAN PERBAIKAN, LOGIKANYA SAMA SEPERTI protect DAN restricTo di authController
+2. MENGHAPUS USER DARI TOUR GUIDES KETIKA MENGGANTI USER ROLES NYA SELAIN GUIDES
+
+
+
+
+
+CATATAN
+guides: [     // ?? Child Referensing
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
+      }
+    ]
+Jika koleksi (collection) yang digunakan dalam database adalah users, maka nilai ref dalam definisi field guides akan menjadi 'User'
+
+
+
+
+
+pada dasarnya block kalau head/content kalau di file lain tidak menambahkan. maka defaultnya adalah yang dimiliki oleh base.pug
+
+catatan untuk parcel
+tambahkan code ini di package.json
+"main": "app.js",
+"targets": {
+  "main": false
+},
+"watch:js": "parcel serve ./public/js/index.js --dist-dir ./public/js/bundled",
+"build:js": "parcel build ./public/js/index.js --dist-dir ./public/js/bundled"
